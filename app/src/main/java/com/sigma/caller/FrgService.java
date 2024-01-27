@@ -69,8 +69,9 @@ public class FrgService extends Service {
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setPriority(NotificationCompat.PRIORITY_MAX)  // Set priority to max
                 .setDefaults(NotificationCompat.DEFAULT_ALL)  // Add defaults (lights, sound, etc.)
-                .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+                .setCategory(NotificationCompat.CATEGORY_ALARM)
                 .setColor(color)  // Set the color here
+                .setColor(ContextCompat.getColor(getApplicationContext(), color))
                 .build();
 
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
