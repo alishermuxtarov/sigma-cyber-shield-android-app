@@ -81,7 +81,6 @@ public class MainActivity extends AppCompatActivity {
     private void startSmsListener() {
         // Start listening to incoming SMS
         // You can add your logic here to handle the incoming SMS
-        Toast.makeText(this, "SMS permission granted. Listening for SMS.", Toast.LENGTH_SHORT).show();
     }
 
     @Override

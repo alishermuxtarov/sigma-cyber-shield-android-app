@@ -1,4 +1,5 @@
-### Sigma Shield Android App
+<img alt="ic_launcher.png" height="100px" src="app%2Fsrc%2Fmain%2Fres%2Fmipmap-xxxhdpi%2Fic_launcher.png" width="100px"/>
+Sigma Shield
 
 | Предупреждение при входящих звонках | Предупреждение при входящих СМС                                    |
 |---------|--------------------------------------------------------------------|
