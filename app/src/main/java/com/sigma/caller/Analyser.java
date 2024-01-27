@@ -20,9 +20,10 @@ public class Analyser {
     }
 
     private HashMap<String, CheckData.CheckDataInfo> data;
+    private HashMap<String, CheckData.CheckDataInfo> keywords;
 
     Analyser() {
-        load();
+        init();
     }
 
     public Result check(String from) {
@@ -61,79 +62,37 @@ public class Analyser {
             }
         }
 
+        for (Map.Entry<String, CheckData.CheckDataInfo> entry : keywords.entrySet()) {
+            if (content.contains(entry.getKey())) {
+                return new Result(false, entry.getValue());
+            }
+        }
+
         return null;
     }
 
-    public void addData(Map.Entry<String, ResponseItem> entry) {
-        data.putIfAbsent(entry.getKey(), new CheckData.CheckDataInfo(
-                entry.getValue().getLevel(),
-                entry.getValue().getTitle(),
-                entry.getValue().getMessage(),
-                entry.getValue().getBlocked()
+    public void addData(HostItem hostItem) {
+        data.putIfAbsent(hostItem.getUrl(), new CheckData.CheckDataInfo(
+                hostItem.getRiskLevel(),
+                hostItem.getRiskLevel() == "warning" ? "Предупреждение" : "Тревога: Запрешенный URL",
+                hostItem.getRiskLevel() == "warning"
+                    ? "Будьте бдительны, никому не сообщайте данные своей карты, коды из СМС"
+                    : "Текст содержит опасный контент",
+                hostItem.getRiskLevel() != "info"
         ));
     }
 
-    public void load() {
-        data = new HashMap<>();
+    public void addKeywords(KeywordItem keywordItem) {
+        keywords.putIfAbsent(keywordItem.getKeyword(), new CheckData.CheckDataInfo(
+                "critical",
+                "Запрешенное ключевое слово",
+                "Это сообщение содержить запрешенные данные или ссылку",
+                true
+        ));
+    }
 
-//        data.put(
-//            "yandex.ru",
-//            new CheckData.CheckDataInfo(
-//                    "info",
-//                    "OK",
-//                    "OK",
-//                    false)
-//        );
-//
-//        data.put(
-//                "998996099335",
-//                new CheckData.CheckDataInfo(
-//                        "warning",
-//                        "Предупреждение",
-//                        "Будьте аккуратны, никому не сообщайте данные своей карты, коды из СМС",
-//
-//                        false
-//                )
-//        );
-//
-//        data.put(
-//                "998907183601",
-//                new CheckData.CheckDataInfo(
-//                        "critical",
-//                        "Ўўў бляя",
-//                        "Мошенник квотти",
-//                        false
-//                )
-//        );
-//
-//        data.put(
-//                "+998907183601",
-//                new CheckData.CheckDataInfo(
-//                        "critical",
-//                        "Ўўў бляя",
-//                        "Мошенник квотти",
-//                        false
-//                )
-//        );
-//
-//        data.put(
-//                "Payme",
-//                new CheckData.CheckDataInfo(
-//                        "critical",
-//                        "Стоп мошенник",
-//                        "Доступ к контенту ограничен. Так как содержит опасный контент!",
-//                        true
-//                )
-//        );
-//
-//        data.put(
-//                "fake.site/getmoney",
-//                new CheckData.CheckDataInfo(
-//                        "critical",
-//                        "Стоп мошенник",
-//                        "Это сообщение содержить вредоносную ссылку!",
-//                        true
-//                )
-//        );
+    public void init() {
+        data = new HashMap<>();
+        keywords = new HashMap<>();
     }
 }

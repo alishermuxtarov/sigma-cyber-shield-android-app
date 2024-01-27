@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -54,7 +55,8 @@ public class FrgService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         createNotificationChannel();
 
-        fetchDataFromServer();
+        fetchKeywordsFromServer();
+        fetchHostsFromServer();
 
         schedulePeriodicTask();
 
@@ -68,7 +70,9 @@ public class FrgService extends Service {
             @Override
             public void run() {
                 // Fetch JSON data from localhost:3000
-                fetchDataFromServer();
+                fetchKeywordsFromServer();
+
+                fetchHostsFromServer();
 
                 // Schedule the next execution
                 handler.postDelayed(this, TimeUnit.MINUTES.toMillis(1));
@@ -76,33 +80,64 @@ public class FrgService extends Service {
         }, TimeUnit.MINUTES.toMillis(1));
     }
 
-    private void fetchDataFromServer() {
+    private void fetchKeywordsFromServer() {
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://172.24.202.10:3000/")  // Replace with your actual local host address
+                .baseUrl("https://odc24.rbc-group.uz/")  // Replace with your actual local host address
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         ApiService apiService = retrofit.create(ApiService.class);
-        Call<Map<String, ResponseItem>> call = apiService.getData();
+        Call<List<KeywordItem>> call = apiService.getKeywords();
 
-        call.enqueue(new Callback<Map<String, ResponseItem>>() {
+        call.enqueue(new Callback<List<KeywordItem>>() {
             @Override
-            public void onResponse(Call<Map<String, ResponseItem>> call, Response<Map<String, ResponseItem>> response) {
+            public void onResponse(Call<List<KeywordItem>> call, Response<List<KeywordItem>> response) {
                 if (response.isSuccessful()) {
                     // Handle the successful response here
-                    Map<String, ResponseItem> data = response.body();
+                    List<KeywordItem> data = response.body();
 
-                    for (Map.Entry<String, ResponseItem> entry : data.entrySet()) {
-                        analayser.addData(entry);
+                    for (KeywordItem keyword : data) {
+                        analayser.addKeywords(keyword);
                     }
                 } else {
-                    // Handle unsuccessful response
+                    Log.d("APP", "Smth went wrong");
                 }
             }
 
             @Override
-            public void onFailure(Call<Map<String, ResponseItem>> call, Throwable t) {
-                Log.d("a", "aaa");
+            public void onFailure(Call<List<KeywordItem>> call, Throwable t) {
+                Log.d("APP", "Smth went wrong");
+            }
+        });
+    }
+
+    private void fetchHostsFromServer() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://odc24.rbc-group.uz/") // Replace with your actual local host address
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        ApiService apiService = retrofit.create(ApiService.class);
+        Call<List<HostItem>> call = apiService.getHosts();
+
+        call.enqueue(new Callback<List<HostItem>>() {
+            @Override
+            public void onResponse(Call<List<HostItem>> call, Response<List<HostItem>> response) {
+                if (response.isSuccessful()) {
+                    // Handle the successful response here
+                    List<HostItem> data = response.body();
+
+                    for (HostItem entry : data) {
+                        analayser.addData(entry);
+                    }
+                } else {
+                    Log.d("APP", "Smth went wrong");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<HostItem>> call, Throwable t) {
+                Log.d("APP", "Smth went wrong");
             }
         });
     }
@@ -118,7 +153,8 @@ public class FrgService extends Service {
         return null;
     }
 
-    public void showNotification(String title, String message, int color) {
+    private void scheduleNotification(String title, String message, int color)
+    {
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 this,
@@ -131,24 +167,27 @@ public class FrgService extends Service {
                 .setContentTitle(title)
                 .setContentText(message)
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setPriority(NotificationCompat.PRIORITY_MAX)  // Set priority to max
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)  // Set priority to max
                 .setDefaults(NotificationCompat.DEFAULT_ALL)  // Add defaults (lights, sound, etc.)
-                .setCategory(NotificationCompat.CATEGORY_ALARM)
+                .setCategory(NotificationCompat.CATEGORY_MESSAGE)
                 .setColor(color)  // Set the color here
                 .setColor(ContextCompat.getColor(getApplicationContext(), color))
                 .build();
 
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             return;
         }
         NotificationManagerCompat.from(this).notify(NOTIFICATION_ID, notification);
+    }
+
+    public void showNotification(String title, String message, int color) {
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                scheduleNotification(title, message, color);
+            }
+        }, 1000); // 1000 milliseconds = 1 second
 
         if (showUIToast) {
             CustomToast.showLongDurationToast(getApplicationContext(), message, 20_000);

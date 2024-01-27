@@ -57,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
                     ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALL_LOG) != PackageManager.PERMISSION_GRANTED
                     ||
                     ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+                    ||
+                    ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED
             ) {
                 ActivityCompat.requestPermissions(
                         this,
@@ -65,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
                                 Manifest.permission.READ_PHONE_STATE,
                                 Manifest.permission.READ_CALL_LOG,
                                 Manifest.permission.POST_NOTIFICATIONS,
+                                Manifest.permission.INTERNET,
                         },
                         SMS_PERMISSION_REQUEST_CODE
                 );
