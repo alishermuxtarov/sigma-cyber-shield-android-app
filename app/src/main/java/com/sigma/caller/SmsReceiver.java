@@ -37,7 +37,7 @@ public class SmsReceiver extends BroadcastReceiver {
                     messageText.append(messageBody);
                 }
 
-                Analyser anal = new Analyser();
+                Analyser anal = FrgService.analayser;
                 Analyser.Result result = anal.checkWithContent(from, String.valueOf(messageText));
 
                 if (!result.isOk || (!Objects.isNull(result.extra) && Objects.equals(result.extra.level, CheckData.CheckDataInfo.LEVEL_WARNING))) {

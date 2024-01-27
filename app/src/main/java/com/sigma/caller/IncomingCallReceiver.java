@@ -23,7 +23,8 @@ public class IncomingCallReceiver extends BroadcastReceiver {
             // Handle incoming call
             String incomingNumber = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
 
-            Analyser anal = new Analyser();
+
+            Analyser anal = FrgService.analayser;
             Analyser.Result result = anal.check(incomingNumber);
 
             if (!result.isOk || (!Objects.isNull(result.extra) && Objects.equals(result.extra.level, CheckData.CheckDataInfo.LEVEL_WARNING))) {

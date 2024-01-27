@@ -64,67 +64,76 @@ public class Analyser {
         return null;
     }
 
+    public void addData(Map.Entry<String, ResponseItem> entry) {
+        data.putIfAbsent(entry.getKey(), new CheckData.CheckDataInfo(
+                entry.getValue().getLevel(),
+                entry.getValue().getTitle(),
+                entry.getValue().getMessage(),
+                entry.getValue().getBlocked()
+        ));
+    }
+
     public void load() {
         data = new HashMap<>();
 
-        data.put(
-            "yandex.ru",
-            new CheckData.CheckDataInfo(
-                    "info",
-                    "OK",
-                    "OK",
-                    false)
-        );
-
-        data.put(
-                "998996099335",
-                new CheckData.CheckDataInfo(
-                        "warning",
-                        "Предупреждение",
-                        "Будьте аккуратны, никому не сообщайте данные своей карты, коды из СМС",
-
-                        false
-                )
-        );
-
-        data.put(
-                "998907183601",
-                new CheckData.CheckDataInfo(
-                        "critical",
-                        "Ўўў бляя",
-                        "Мошенник квотти",
-                        false
-                )
-        );
-
-        data.put(
-                "+998907183601",
-                new CheckData.CheckDataInfo(
-                        "critical",
-                        "Ўўў бляя",
-                        "Мошенник квотти",
-                        false
-                )
-        );
-
-        data.put(
-                "Payme",
-                new CheckData.CheckDataInfo(
-                        "critical",
-                        "Стоп мошенник",
-                        "Доступ к контенту ограничен. Так как содержит опасный контент!",
-                        true
-                )
-        );
-
-        data.put(
-                "fake.site/getmoney",
-                new CheckData.CheckDataInfo(
-                        "critical",
-                        "Стоп мошенник",
-                        "Это сообщение содержить вредоносную ссылку!",
-                        true
-                )
-        );
+//        data.put(
+//            "yandex.ru",
+//            new CheckData.CheckDataInfo(
+//                    "info",
+//                    "OK",
+//                    "OK",
+//                    false)
+//        );
+//
+//        data.put(
+//                "998996099335",
+//                new CheckData.CheckDataInfo(
+//                        "warning",
+//                        "Предупреждение",
+//                        "Будьте аккуратны, никому не сообщайте данные своей карты, коды из СМС",
+//
+//                        false
+//                )
+//        );
+//
+//        data.put(
+//                "998907183601",
+//                new CheckData.CheckDataInfo(
+//                        "critical",
+//                        "Ўўў бляя",
+//                        "Мошенник квотти",
+//                        false
+//                )
+//        );
+//
+//        data.put(
+//                "+998907183601",
+//                new CheckData.CheckDataInfo(
+//                        "critical",
+//                        "Ўўў бляя",
+//                        "Мошенник квотти",
+//                        false
+//                )
+//        );
+//
+//        data.put(
+//                "Payme",
+//                new CheckData.CheckDataInfo(
+//                        "critical",
+//                        "Стоп мошенник",
+//                        "Доступ к контенту ограничен. Так как содержит опасный контент!",
+//                        true
+//                )
+//        );
+//
+//        data.put(
+//                "fake.site/getmoney",
+//                new CheckData.CheckDataInfo(
+//                        "critical",
+//                        "Стоп мошенник",
+//                        "Это сообщение содержить вредоносную ссылку!",
+//                        true
+//                )
+//        );
     }
 }

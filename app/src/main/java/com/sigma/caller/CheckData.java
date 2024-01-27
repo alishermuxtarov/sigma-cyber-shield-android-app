@@ -7,7 +7,6 @@ public class CheckData {
     public static class CheckDataInfo {
         public static final String LEVEL_WARNING = "warning";
 
-
         public String level;
         public String title;
         public String message;

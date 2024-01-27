@@ -8,6 +8,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
 
 import androidx.core.app.ActivityCompat;
@@ -16,14 +17,26 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
+import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 public class FrgService extends Service {
 
     private static final int NOTIFICATION_ID = 1;
+    public static Analyser analayser;
     public static boolean showUIToast = false;
     private static final String CHANNEL_ID = "ForegroundServiceChannel";
 
@@ -32,6 +45,7 @@ public class FrgService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        analayser = new Analyser();
         SmsReceiver.fgs = this;
         IncomingCallReceiver.fgs = this;
     }
@@ -40,7 +54,57 @@ public class FrgService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         createNotificationChannel();
 
+        fetchDataFromServer();
+
+        schedulePeriodicTask();
+
         return START_STICKY;
+    }
+
+    private void schedulePeriodicTask() {
+        // Use a Handler or a ScheduledExecutorService to schedule the task
+        final Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // Fetch JSON data from localhost:3000
+                fetchDataFromServer();
+
+                // Schedule the next execution
+                handler.postDelayed(this, TimeUnit.MINUTES.toMillis(1));
+            }
+        }, TimeUnit.MINUTES.toMillis(1));
+    }
+
+    private void fetchDataFromServer() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://172.24.202.10:3000/")  // Replace with your actual local host address
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        ApiService apiService = retrofit.create(ApiService.class);
+        Call<Map<String, ResponseItem>> call = apiService.getData();
+
+        call.enqueue(new Callback<Map<String, ResponseItem>>() {
+            @Override
+            public void onResponse(Call<Map<String, ResponseItem>> call, Response<Map<String, ResponseItem>> response) {
+                if (response.isSuccessful()) {
+                    // Handle the successful response here
+                    Map<String, ResponseItem> data = response.body();
+
+                    for (Map.Entry<String, ResponseItem> entry : data.entrySet()) {
+                        analayser.addData(entry);
+                    }
+                } else {
+                    // Handle unsuccessful response
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Map<String, ResponseItem>> call, Throwable t) {
+                Log.d("a", "aaa");
+            }
+        });
     }
 
     @Override
