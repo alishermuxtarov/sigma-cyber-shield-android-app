@@ -1,5 +1,6 @@
 package com.sigma.caller;
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -34,8 +36,12 @@ public class MainActivity extends AppCompatActivity {
         SmsReceiver.view = findViewById(android.R.id.content);
         IncomingCallReceiver.view = findViewById(android.R.id.content);
 
-        // Create Snackbar with custom view
-
+        Intent serviceIntent = new Intent(this, FrgService.class);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(serviceIntent);
+        } else {
+            startService(serviceIntent);
+        }
         ///////
 
 
@@ -50,6 +56,8 @@ public class MainActivity extends AppCompatActivity {
                     ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED
                     ||
                     ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALL_LOG) != PackageManager.PERMISSION_GRANTED
+                    ||
+                    ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
             ) {
                 ActivityCompat.requestPermissions(
                         this,
@@ -57,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
                                 Manifest.permission.RECEIVE_SMS,
                                 Manifest.permission.READ_PHONE_STATE,
                                 Manifest.permission.READ_CALL_LOG,
+                                Manifest.permission.POST_NOTIFICATIONS,
                         },
                         SMS_PERMISSION_REQUEST_CODE
                 );

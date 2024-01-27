@@ -61,6 +61,26 @@ public class Analyser {
         );
 
         data.put(
+                "998907183601",
+                new CheckData.CheckDataInfo(
+                        "critical",
+                        "Ўўў бляя",
+                        "Мошенник квотти",
+                        false
+                )
+        );
+
+        data.put(
+                "+998907183601",
+                new CheckData.CheckDataInfo(
+                        "critical",
+                        "Ўўў бляя",
+                        "Мошенник квотти",
+                        false
+                )
+        );
+
+        data.put(
                 "Payme",
                 new CheckData.CheckDataInfo(
                         "critical",

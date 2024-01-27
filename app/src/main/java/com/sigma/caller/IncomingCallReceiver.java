@@ -14,6 +14,7 @@ import java.util.Objects;
 
 public class IncomingCallReceiver extends BroadcastReceiver {
     public static View view;
+    public static FrgService fgs;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -35,6 +36,10 @@ public class IncomingCallReceiver extends BroadcastReceiver {
                 );
 
                 snackbar.show();
+
+                if (Objects.nonNull(fgs)) {
+                    fgs.showNotification(result.extra.title, result.extra.message);
+                }
             }
         }
     }
