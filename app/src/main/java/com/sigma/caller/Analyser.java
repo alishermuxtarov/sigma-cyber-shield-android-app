@@ -24,7 +24,11 @@ public class Analyser {
         load();
     }
 
-    public Result check(String from, String content) {
+    public Result check(String from) {
+        return checkWithContent(from, "");
+    }
+
+    public Result checkWithContent(String from, String content) {
         CheckData.CheckDataInfo el = data.get(from);
 
         if (Objects.isNull(el) || !el.block) {

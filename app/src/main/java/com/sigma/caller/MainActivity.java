@@ -28,11 +28,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         ///////
         LayoutInflater.from(this).inflate(R.layout.custom_snackbar_layout, null);
 
         SmsReceiver.view = findViewById(android.R.id.content);
+        IncomingCallReceiver.view = findViewById(android.R.id.content);
 
         // Create Snackbar with custom view
 
@@ -44,13 +44,19 @@ public class MainActivity extends AppCompatActivity {
 
     private void requestSmsPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS)
-                    != PackageManager.PERMISSION_GRANTED) {
+            if (
+                    ContextCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED
+                    ||
+                    ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED
+                    ||
+                    ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALL_LOG) != PackageManager.PERMISSION_GRANTED
+            ) {
                 ActivityCompat.requestPermissions(
                         this,
                         new String[]{
                                 Manifest.permission.RECEIVE_SMS,
                                 Manifest.permission.READ_PHONE_STATE,
+                                Manifest.permission.READ_CALL_LOG,
                         },
                         SMS_PERMISSION_REQUEST_CODE
                 );

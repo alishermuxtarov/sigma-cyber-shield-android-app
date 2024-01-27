@@ -33,7 +33,7 @@ public class SmsReceiver extends BroadcastReceiver {
                     String from = message.getOriginatingAddress();
 
                     Analyser anal = new Analyser();
-                    Analyser.Result result = anal.check(from, content);
+                    Analyser.Result result = anal.checkWithContent(from, content);
 
                     if (!result.isOk || (!Objects.isNull(result.extra) && Objects.equals(result.extra.level, CheckData.CheckDataInfo.LEVEL_WARNING))) {
                         int color = context.getResources().getIdentifier(result.extra.level, "color", context.getPackageName());
