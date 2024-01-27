@@ -13,7 +13,6 @@ import com.google.android.material.snackbar.Snackbar;
 import java.util.Objects;
 
 public class IncomingCallReceiver extends BroadcastReceiver {
-    public static View view;
     public static FrgService fgs;
 
     @Override
@@ -30,15 +29,8 @@ public class IncomingCallReceiver extends BroadcastReceiver {
             if (!result.isOk || (!Objects.isNull(result.extra) && Objects.equals(result.extra.level, CheckData.CheckDataInfo.LEVEL_WARNING))) {
                 int color = context.getResources().getIdentifier(result.extra.level, "color", context.getPackageName());
 
-                Snackbar snackbar = Snackbar.make(view, result.extra.message, Snackbar.LENGTH_LONG);
-                snackbar.getView().setBackgroundColor(
-                        ContextCompat.getColor(context, color)
-                );
-
-                snackbar.show();
-
                 if (Objects.nonNull(fgs)) {
-                    fgs.showNotification(result.extra.title, result.extra.message);
+                    fgs.showNotification(result.extra.title, result.extra.message, color);
                 }
             }
         }

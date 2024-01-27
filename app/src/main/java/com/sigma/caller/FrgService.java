@@ -5,13 +5,9 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.os.Handler;
 import android.os.IBinder;
 
 import androidx.core.app.ActivityCompat;
@@ -20,41 +16,29 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
-import android.os.Looper;
-import android.provider.Telephony;
-import android.telephony.SmsMessage;
+import android.view.View;
 import android.widget.Toast;
+
+import com.google.android.material.snackbar.Snackbar;
 
 public class FrgService extends Service {
 
     private static final int NOTIFICATION_ID = 1;
+    public static boolean showUIToast = false;
     private static final String CHANNEL_ID = "ForegroundServiceChannel";
-//    private Handler handler;
-//    private SmsBroadcastReceiver smsBroadcastReceiver;
+
+    public static View view;
 
     @Override
     public void onCreate() {
         super.onCreate();
-//        handler = new Handler(getMainLooper());
-
         SmsReceiver.fgs = this;
         IncomingCallReceiver.fgs = this;
-
-//        smsBroadcastReceiver = new SmsBroadcastReceiver();
-//        registerSmsReceiver();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         createNotificationChannel();
-
-//        // Show Notification using Handler
-//        handler.post(new Runnable() {
-//            @Override
-//            public void run() {
-//                showNotification("Foreground Service started");
-//            }
-//        });
 
         return START_STICKY;
     }
@@ -62,7 +46,6 @@ public class FrgService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        // unregisterSmsReceiver();
     }
 
     @Nullable
@@ -71,7 +54,7 @@ public class FrgService extends Service {
         return null;
     }
 
-    public void showNotification(String title, String message) {
+    public void showNotification(String title, String message, int color) {
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 this,
@@ -87,6 +70,7 @@ public class FrgService extends Service {
                 .setPriority(NotificationCompat.PRIORITY_MAX)  // Set priority to max
                 .setDefaults(NotificationCompat.DEFAULT_ALL)  // Add defaults (lights, sound, etc.)
                 .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+                .setColor(color)  // Set the color here
                 .build();
 
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
@@ -101,7 +85,19 @@ public class FrgService extends Service {
         }
         NotificationManagerCompat.from(this).notify(NOTIFICATION_ID, notification);
 
-        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+        if (showUIToast) {
+            CustomToast.showLongDurationToast(getApplicationContext(), message, 20_000);
+        } else {
+            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+        }
+
+//        Snackbar snackbar = Snackbar.make(view, message, Snackbar.LENGTH_LONG);
+//        snackbar.getView().setBackgroundColor(
+//                ContextCompat.getColor(context, color)
+//        );
+//
+//        snackbar.show();
+
     }
 
     private void createNotificationChannel() {
@@ -111,40 +107,10 @@ public class FrgService extends Service {
                     "Foreground Service Channel",
                     NotificationManager.IMPORTANCE_HIGH
             );
+            serviceChannel.setDescription("pew pew");
 
             NotificationManager manager = getSystemService(NotificationManager.class);
             manager.createNotificationChannel(serviceChannel);
         }
     }
-
-//    private void registerSmsReceiver() {
-//        IntentFilter intentFilter = new IntentFilter("android.provider.Telephony.SMS_RECEIVED");
-//        registerReceiver(smsBroadcastReceiver, intentFilter);
-//    }
-
-//    private void unregisterSmsReceiver() {
-//        unregisterReceiver(smsBroadcastReceiver);
-//    }
-
-    // BroadcastReceiver to handle SMS received events
-//    private class SmsBroadcastReceiver extends BroadcastReceiver {
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            if (intent.getAction() != null && intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED")) {
-//                // Extract SMS messages
-//                SmsMessage[] messages = Telephony.Sms.Intents.getMessagesFromIntent(intent);
-//
-//                if (messages != null && messages.length > 0) {
-//                    // Handle SMS messages and show a notification
-//                    String sender = messages[0].getOriginatingAddress();
-//                    String messageBody = messages[0].getMessageBody();
-//
-//                    String notificationText = "SMS Received from " + sender + ": " + messageBody;
-//
-//                    // Show Notification
-//                    showNotification(notificationText);
-//                }
-//            }
-//        }
-//    }
 }

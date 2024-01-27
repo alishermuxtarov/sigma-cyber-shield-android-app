@@ -1,6 +1,7 @@
 package com.sigma.caller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -32,10 +33,35 @@ public class Analyser {
         CheckData.CheckDataInfo el = data.get(from);
 
         if (Objects.isNull(el) || !el.block) {
+            if (!content.isEmpty()) {
+                Result contentEl = checkContent(content);
+                if (contentEl != null) {
+                    return contentEl;
+                }
+
+            }
             return new Result(true, el);
         }
 
+        Result contentEl = checkContent(content);
+        if (contentEl != null) {
+            return contentEl;
+        }
+
         return new Result(false, el);
+    }
+
+    private Result checkContent(String content)
+    {
+        for (String url: Utils.getUrls(content)) {
+            CheckData.CheckDataInfo urlEl = data.get(url);
+
+            if (Objects.nonNull(urlEl)) {
+                return new Result(false, urlEl);
+            }
+        }
+
+        return null;
     }
 
     public void load() {
@@ -55,7 +81,8 @@ public class Analyser {
                 new CheckData.CheckDataInfo(
                         "warning",
                         "Предупреждение",
-                        "Будьте аккуратны, сайт содержит недостоверный материал",
+                        "Будьте аккуратны, никому не сообщайте данные своей карты, коды из СМС",
+
                         false
                 )
         );
@@ -86,6 +113,16 @@ public class Analyser {
                         "critical",
                         "Стоп мошенник",
                         "Доступ к контенту ограничен. Так как содержит опасный контент!",
+                        true
+                )
+        );
+
+        data.put(
+                "fake.site/getmoney",
+                new CheckData.CheckDataInfo(
+                        "critical",
+                        "Стоп мошенник",
+                        "Это сообщение содержить вредоносную ссылку!",
                         true
                 )
         );

@@ -33,8 +33,7 @@ public class MainActivity extends AppCompatActivity {
         ///////
         LayoutInflater.from(this).inflate(R.layout.custom_snackbar_layout, null);
 
-        SmsReceiver.view = findViewById(android.R.id.content);
-        IncomingCallReceiver.view = findViewById(android.R.id.content);
+        FrgService.view = findViewById(android.R.id.content);
 
         Intent serviceIntent = new Intent(this, FrgService.class);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -100,4 +99,45 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+    @Override
+    protected void onResume() {
+        FrgService.showUIToast = true;
+        super.onResume();
+    }
+
+    @Override
+    protected void onRestart() {
+        FrgService.showUIToast = true;
+        super.onRestart();
+        // Perform actions when the app is restarting after being stopped
+    }
+
+    @Override
+    protected void onDestroy() {
+        FrgService.showUIToast = false;
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onPause() {
+        FrgService.showUIToast = false;
+        super.onPause();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        FrgService.showUIToast = false;
+        super.onSaveInstanceState(outState);
+        // Save state information before the activity is paused
+    }
+
+    @Override
+    protected void onStop() {
+        FrgService.showUIToast = false;
+
+        super.onStop();
+        // Perform cleanup or resource releases when the app is going into the background
+    }
+
 }

@@ -16,7 +16,6 @@ import java.util.Objects;
 
 
 public class SmsReceiver extends BroadcastReceiver {
-    public static View view;
     public static FrgService fgs;
 
     @Override
@@ -25,32 +24,27 @@ public class SmsReceiver extends BroadcastReceiver {
             Object[] pdus = (Object[]) intent.getExtras().get("pdus");
 
             if (pdus != null) {
-                SmsMessage[] messages = new SmsMessage[pdus.length];
+                // SmsMessage[] messages = new SmsMessage[pdus.length];
+                StringBuilder messageText = new StringBuilder();
+                String from = "";
 
                 for (int i = 0; i < pdus.length; i++) {
-                    messages[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
+                    // messages[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
+                    SmsMessage smsMessage = SmsMessage.createFromPdu((byte[]) pdus[i]);
+                    String messageBody = smsMessage.getMessageBody();
+                    from = smsMessage.getOriginatingAddress();
+
+                    messageText.append(messageBody);
                 }
 
-                for (SmsMessage message : messages) {
-                    String content = message.getMessageBody();
-                    String from = message.getOriginatingAddress();
+                Analyser anal = new Analyser();
+                Analyser.Result result = anal.checkWithContent(from, String.valueOf(messageText));
 
-                    Analyser anal = new Analyser();
-                    Analyser.Result result = anal.checkWithContent(from, content);
+                if (!result.isOk || (!Objects.isNull(result.extra) && Objects.equals(result.extra.level, CheckData.CheckDataInfo.LEVEL_WARNING))) {
+                    int color = context.getResources().getIdentifier(result.extra.level, "color", context.getPackageName());
 
-                    if (!result.isOk || (!Objects.isNull(result.extra) && Objects.equals(result.extra.level, CheckData.CheckDataInfo.LEVEL_WARNING))) {
-                        int color = context.getResources().getIdentifier(result.extra.level, "color", context.getPackageName());
-
-                        Snackbar snackbar = Snackbar.make(view, result.extra.message, Snackbar.LENGTH_LONG);
-                        snackbar.getView().setBackgroundColor(
-                                ContextCompat.getColor(context, color)
-                        );
-
-                        snackbar.show();
-
-                        if (Objects.nonNull(fgs)) {
-                            fgs.showNotification(result.extra.title, result.extra.message);
-                        }
+                    if (Objects.nonNull(fgs)) {
+                        fgs.showNotification(result.extra.title, result.extra.message, color);
                     }
                 }
             }
