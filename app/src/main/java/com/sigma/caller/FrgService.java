@@ -189,11 +189,11 @@ public class FrgService extends Service {
             }
         }, 1500); // 1000 milliseconds = 1 second
 
-        if (showUIToast) {
+//        if (showUIToast) {
             CustomToast.showLongDurationToast(getApplicationContext(), message, 20_000);
-        } else {
+//        } else {
             Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
-        }
+//        }
 
 //        Snackbar snackbar = Snackbar.make(view, message, Snackbar.LENGTH_LONG);
 //        snackbar.getView().setBackgroundColor(

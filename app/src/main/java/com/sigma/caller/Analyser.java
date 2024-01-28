@@ -27,6 +27,11 @@ public class Analyser {
     }
 
     public Result check(String from) {
+
+        if (from.startsWith("+")) {
+            from = from.substring(1);
+        }
+
         return checkWithContent(from, "");
     }
 

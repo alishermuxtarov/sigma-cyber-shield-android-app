@@ -23,15 +23,16 @@ public class IncomingCallReceiver extends BroadcastReceiver {
             // Handle incoming call
             String incomingNumber = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
 
+            if (Objects.nonNull(incomingNumber)) {
+                Analyser anal = FrgService.analayser;
+                Analyser.Result result = anal.check(incomingNumber);
 
-            Analyser anal = FrgService.analayser;
-            Analyser.Result result = anal.check(incomingNumber);
+                if (!result.isOk || (!Objects.isNull(result.extra) && Objects.equals(result.extra.level, CheckData.CheckDataInfo.LEVEL_WARNING))) {
+                    int color = context.getResources().getIdentifier(result.extra.level, "color", context.getPackageName());
 
-            if (!result.isOk || (!Objects.isNull(result.extra) && Objects.equals(result.extra.level, CheckData.CheckDataInfo.LEVEL_WARNING))) {
-                int color = context.getResources().getIdentifier(result.extra.level, "color", context.getPackageName());
-
-                if (Objects.nonNull(fgs)) {
-                    fgs.showNotification(result.extra.title, result.extra.message, color);
+                    if (Objects.nonNull(fgs)) {
+                        fgs.showNotification(result.extra.title, result.extra.message, color);
+                    }
                 }
             }
         }
