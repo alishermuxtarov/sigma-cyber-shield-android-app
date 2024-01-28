@@ -187,7 +187,7 @@ public class FrgService extends Service {
             public void run() {
                 scheduleNotification(title, message, color);
             }
-        }, 1000); // 1000 milliseconds = 1 second
+        }, 1500); // 1000 milliseconds = 1 second
 
         if (showUIToast) {
             CustomToast.showLongDurationToast(getApplicationContext(), message, 20_000);

@@ -71,11 +71,26 @@ public class Analyser {
         return null;
     }
 
+    public static boolean isNumeric(String strNum) {
+        if (strNum == null) {
+            return false;
+        }
+        try {
+            double d = Double.parseDouble(strNum);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return true;
+    }
+
     public void addData(HostItem hostItem) {
+
+
+
         data.putIfAbsent(hostItem.getUrl(), new CheckData.CheckDataInfo(
                 hostItem.getRiskLevel(),
-                hostItem.getRiskLevel() == "warning" ? "Предупреждение" : "Тревога: Запрешенный URL",
-                hostItem.getRiskLevel() == "warning"
+                hostItem.getRiskLevel().equals("warning") || (!hostItem.getRiskLevel().equals("critial") && isNumeric(hostItem.getUrl())) ? "Предупреждение" : "Тревога: Запрешенный URL",
+                hostItem.getRiskLevel().equals("warning") || (!hostItem.getRiskLevel().equals("critial") && isNumeric(hostItem.getUrl()))
                     ? "Будьте бдительны, никому не сообщайте данные своей карты, коды из СМС"
                     : "Текст содержит опасный контент",
                 hostItem.getRiskLevel() != "info"
